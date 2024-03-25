@@ -25,6 +25,7 @@ class Widgetbook extends StatefulWidget {
     this.appBuilder = widgetsAppBuilder,
     this.addons,
     this.integrations,
+    this.themeExtensions = const [],
   });
 
   /// A [Widgetbook] with [CupertinoApp] as an [appBuilder].
@@ -35,6 +36,7 @@ class Widgetbook extends StatefulWidget {
     this.appBuilder = cupertinoAppBuilder,
     this.addons,
     this.integrations,
+    this.themeExtensions = const [],
   });
 
   /// A [Widgetbook] with [MaterialApp] as an [appBuilder].
@@ -45,6 +47,7 @@ class Widgetbook extends StatefulWidget {
     this.appBuilder = materialAppBuilder,
     this.addons,
     this.integrations,
+    this.themeExtensions = const [],
   });
 
   /// The initial route for that will be used on first startup.
@@ -70,6 +73,10 @@ class Widgetbook extends StatefulWidget {
   /// integrate with Widgetbook Cloud via [WidgetbookCloudIntegration], but
   /// can also be used to integrate with third-party packages.
   final List<WidgetbookIntegration>? integrations;
+
+  /// A list of [ThemeExtension] added to the Theme.
+  /// This might be needed if you show Dialogs/Modals that require certain ThemeExtension
+  final List<ThemeExtension<dynamic>> themeExtensions;
 
   @override
   State<Widgetbook> createState() => _WidgetbookState();
@@ -110,8 +117,20 @@ class _WidgetbookState extends State<Widgetbook> {
       state: state,
       child: MaterialApp.router(
         title: 'Widgetbook',
-        theme: Themes.light,
-        darkTheme: Themes.dark,
+        theme: Themes.light.copyWith(
+          extensions: [
+            ...widget.themeExtensions,
+            // Widgetbook Specific Extension take priority over user defined ones
+            ...Themes.light.extensions.values,
+          ],
+        ),
+        darkTheme: Themes.dark.copyWith(
+          extensions: [
+            ...widget.themeExtensions,
+            // Widgetbook Specific Extension take priority over user defined ones
+            ...Themes.dark.extensions.values,
+          ],
+        ),
         routerConfig: router,
         debugShowCheckedModeBanner: false,
       ),
